@@ -1,0 +1,64 @@
+﻿"Phrases"
+{
+	"Reports Menu Title"
+	{
+		"pl"	"Wybierz gracza którego chcesz zgłosić"
+	}
+	
+	"Invalid Target Index"
+	{
+		"pl"	"Nieprawidłowy index dla docelowego gracza"
+	}
+
+	"Reports Reasons Title"
+	{
+		"#format" "{1:s},{2:s}"
+		"pl"	"Wybierz Powód Zgłoszenia{1}Gracz który zostanie zgłoszony [ {2} ]"
+	}
+	
+	"Input Custom Reason"
+	{
+		"pl"	"Wpisz swój powód zgłoszenia na czacie..."
+	}
+	"Entered Reason Too Long"
+	{
+		"pl"	"Twój powód zgłoszenia jest za długi"
+	}
+	"Entered Reason Is Empty"
+	{
+		"pl"	"Powód zgłoszenia nie może być pusty"
+	}
+	
+	"Report Successfuly Sent"
+	{
+		"#format" "{1:s}"
+		"pl"	"Zgłoszenie zostało pomyślnie wysłane na gracza: {darkred}{1}"
+	}
+	
+	"Report Is On Cooldown"
+	{
+		"#format"	"{1:d}"
+		"pl"		"Zgosiłeś już niedawno gracza. Proszę odczekaj {green}{1}{yellow} sekund i spróbuj ponownie."
+	}
+	
+	"Admin MSG Title"
+	{
+		"pl"		"{yellow}--- {lightred}POWIADOMIENIE O ZGŁOSZENIU {yellow}---"
+	}
+	"Admin MSG Who Reported"
+	{
+		"#format"	"{1:s}"
+		"pl"		"Zgłoszenie od gracza: {green}{1}"
+	}
+	"Admin MSG Reported Player"
+	{
+		"#format"	"{1:s}"
+		"pl"		"Zgłoszony gracz: {darkred}{1}"
+	}
+	"Admin MSG Report Reason"
+	{
+		"#format"	"{1:s}"
+		"pl"		"Powód: {purple}{1}"
+	}
+	
+}

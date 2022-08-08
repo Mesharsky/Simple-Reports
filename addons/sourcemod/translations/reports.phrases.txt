@@ -1,0 +1,65 @@
+﻿"Phrases"
+{
+	"Reports Menu Title"
+	{
+		"en"	"Choose the player you want to report"
+	}
+	
+	"Invalid Target Index"
+	{
+		"en"	"Invalid Index For Target"
+	}
+
+	"Reports Reasons Title"
+	{
+		"#format" "{1:s},{2:s}"
+		"en"	"Select Report Reason{1}Player that will be reported [ {2} ]"
+	}
+	
+	"Input Custom Reason"
+	{
+		"en"	"Enter your reason for reporting in the chat."
+	}
+	"Entered Reason Too Long"
+	{
+		"en"	"Your entered reason is too long"
+	}
+	"Entered Reason Is Empty"
+	{
+		"en"	"Your reason can't be empty"
+	}
+	
+	"Report Successfuly Sent"
+	{
+		"#format" "{1:s}"
+		"en"	"Your report has been sent for player: {darkred}{1}"
+	}
+	
+	"Report Is On Cooldown"
+	{
+		"#format"	"{1:d}"
+		"en"		"You reported player recently. Please wait {green}{1}{yellow} seconds and try again."
+	}
+	
+	"Admin MSG Title"
+	{
+		"en"		"{yellow}--- {lightred}REPORT NOTIFICATION {yellow}---"
+	}
+	
+	"Admin MSG Who Reported"
+	{
+		"#format"	"{1:s}"
+		"en"		"Report from player: {green}{1}"
+	}
+	
+	"Admin MSG Reported Player"
+	{
+		"#format"	"{1:s}"
+		"en"		"Reported player: {darkred}{1}"
+	}
+	"Admin MSG Report Reason"
+	{
+		"#format"	"{1:s}"
+		"en"		"Reason: {purple}{1}"
+	}
+}
