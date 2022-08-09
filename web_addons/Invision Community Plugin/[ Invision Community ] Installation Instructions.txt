@@ -1,0 +1,11 @@
+To install the plugin go to ACP -> System -> Plugins
+
+Click the Install new plugin button
+
+Then select the plug-in and click Install
+
+We wait a few seconds and our plugin is already installed.
+
+To quickly disable or enable the plug, click the green or red icon.
+
+The next three icons mean editing the plugin, uploading a newer version of the plugin, uninstalling and showing plugin details.

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin name="(DF) Report Players" version_long="10000" version_human="1.0.0" author="daffyy" website="https://daffyy.pl" update_check=""><hooks/><settings><setting><key>dfreportplayers_canView</key><default/></setting><setting><key>dfreportplayers_host</key><default/></setting><setting><key>dfreportplayers_user</key><default/></setting><setting><key>dfreportplayers_password</key><default/></setting><setting><key>dfreportplayers_database</key><default/></setting><setting><key>dfreportplayers_limit</key><default>10</default></setting></settings><settingsCode><![CDATA[//<?php
+
+	$groups = \IPS\Member\Group::groups();
+	$form->addTab('dfreportplayers_general');
+	$form->add(new \IPS\Helpers\Form\Select('dfreportplayers_canView', (\IPS\Settings::i()->dfreportplayers_canView == 'all') ? 'all' : explode(',', \IPS\Settings::i()->dfreportplayers_canView), FALSE, array('options' => $groups, 'parse' => 'normal', 'multiple' => true, 'unlimited' => 'all', 'unlimitedLang' => 'all_groups'), NULL, NULL, NULL, 'dfreportplayers_canView'));
+
+	$form->add(new \IPS\Helpers\Form\Text('dfreportplayers_host',  \IPS\Settings::i()->dfreportplayers_host, TRUE, [], NULL, NULL, NULL, 'dfreportplayers_host'));
+	$form->add(new \IPS\Helpers\Form\Text('dfreportplayers_user',  \IPS\Settings::i()->dfreportplayers_user, TRUE, [], NULL, NULL, NULL, 'dfreportplayers_user'));
+	$form->add(new \IPS\Helpers\Form\Password('dfreportplayers_password',  \IPS\Settings::i()->dfreportplayers_password, TRUE, [], NULL, NULL, NULL, 'dfreportplayers_password'));
+	$form->add(new \IPS\Helpers\Form\Text('dfreportplayers_database',  \IPS\Settings::i()->dfreportplayers_database, TRUE, [], NULL, NULL, NULL, 'dfreportplayers_database'));
+	$form->add(new \IPS\Helpers\Form\Number('dfreportplayers_limit',  \IPS\Settings::i()->dfreportplayers_limit, TRUE, [], NULL, NULL, NULL, 'dfreportplayers_limit'));
+
+
+	if ($values = $form->values()) {
+
+		if ($values['dfreportplayers_canView'] && ($values['dfreportplayers_canView'] != 'all')) {
+			$values['dfreportplayers_canView'] = implode(",", $values['dfreportplayers_canView']);
+		} elseif ($values['dfreportplayers_canView'] == 'all') {
+			$values['dfreportplayers_canView'] = 'all';
+		} else {
+			$values['dfreportplayers_canView'] = NULL;
+		}
+
+		$form->saveAsSettings();
+		return TRUE;
+	}
+	return $form;
+]]></settingsCode><widgets><widget key="dfreportplayersWidget" class="\IPS\Widget" restrict="sidebar,cms" default_area="" allow_reuse="1" menu_style="menu" embeddable=""><![CDATA[<?php
+/**
+ * @brief		dfreportplayersWidget Widget
+ * @author		<a href='https://www.invisioncommunity.com'>Invision Power Services, Inc.</a>
+ * @copyright	(c) Invision Power Services, Inc.
+ * @license		https://www.invisioncommunity.com/legal/standards/
+ * @package		Invision Community
+ * @subpackage	dfreportplayers
+ * @since		07 Aug 2022
+ */
+
+namespace IPS\plugins\<{LOCATION}>\widgets;
+
+/* To prevent PHP errors (extending class does not exist) revealing path */
+if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
+{
+	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+	exit;
+}
+
+/**
+ * dfreportplayersWidget Widget
+ */
+class _dfreportplayersWidget extends \IPS\Widget
+{
+
+	/**
+	 * @brief	Connection Settings
+	 */
+	public $connectionSettings = [];
+
+	/**
+	 * @brief	Database Store
+	 */
+	protected $database;
+
+	/**
+	 * @brief	Widget Key
+	 */
+	public $key = 'dfreportplayersWidget';
+	
+	/**
+	 * @brief	App
+	 */
+	
+		
+	/**
+	 * @brief	Plugin
+	 */
+	public $plugin = '<{ID}>';
+	
+	/**
+	 * Initialise this widget
+	 *
+	 * @return void
+	 */ 
+	public function init()
+	{
+		$this->template(array(\IPS\Theme::i()->getTemplate('plugins', 'core', 'global'), $this->key));
+		
+		try {
+			$this->connectionSettings = [
+				'sql_host'		=> \IPS\Settings::i()->dfreportplayers_host,
+				'sql_port'		=> \IPS\Settings::i()->dfreportplayers_port,
+				'sql_user'		=> \IPS\Settings::i()->dfreportplayers_user,
+				'sql_pass'		=> \IPS\Settings::i()->dfreportplayers_password,
+				'sql_database'	=> \IPS\Settings::i()->dfreportplayers_database,
+			];
+			$this->database = \IPS\Db::i($this->key, $this->connectionSettings);
+			$this->database->query('SET NAMES utf8mb4');
+
+		} catch (\Exception $e) {
+			\IPS\Log::log($e, 'dfreportplayers_mysql_issue');
+		}
+
+		parent::init();
+	}
+	
+	/**
+	 * Specify widget configuration
+	 *
+	 * @param	null|\IPS\Helpers\Form	$form	Form object
+	 * @return	null|\IPS\Helpers\Form
+	 */
+	public function configuration( &$form=null )
+	{
+ 		$form = parent::configuration( $form );
+ 		return $form;
+ 	} 
+ 	
+ 	 /**
+ 	 * Ran before saving widget configuration
+ 	 *
+ 	 * @param	array	$values	Values from form
+ 	 * @return	array
+ 	 */
+ 	public function preConfig( $values )
+ 	{
+ 		return $values;
+ 	}
+
+	/**
+	 * Render a widget
+	 *
+	 * @return	string
+	 */
+	public function render()
+	{
+		try {
+			if ((\IPS\Settings::i()->dfreportplayers_canView <> 'all' and !\IPS\Member::loggedIn()->inGroup(\IPS\Settings::i()->dfreportplayers_canView, TRUE))) {
+				return '';
+			}
+
+			$data = [];
+
+			foreach ($this->database->select('*', 'reports', '', 'id DESC', \IPS\Settings::i()->dfreportplayers_limit) as $row) {
+				if ($this->skipAdvert($row['report_reason'])) {
+					continue;
+				}
+
+				$row['report_reason']	= $this->removeInvalidCharacters($this->censorWords($row['report_reason']));
+				$row['client_name'] = $this->removeInvalidCharacters($row['client_name']);
+				$row['target_name'] = $this->removeInvalidCharacters($row['target_name']);
+				switch ($row['game']) {
+					case 'cs16':
+						$row['typeName']	= 'Counter-Strike 1.6';
+						$row['typeAlt']	= 'cs16';
+						$row['type']		= $this->getIconThumbs('cs16');
+						$row['client_steamid']	= $this->toCommunityId($row['client_steamid']);
+						$row['target_steamid']	= $this->toCommunityId($row['target_steamid']);
+						break;
+					case 'cssource':
+						$row['typeName']	= 'Counter-Strike: Source';
+						$row['typeAlt']	= 'cssource';
+						$row['type']		= $this->getIconThumbs('cssource');
+						break;
+					case 'tf2':
+						$row['typeName']	= 'Team Fortress 2';
+						$row['typeAlt']	= 'tf2';
+						$row['type']		= $this->getIconThumbs('tf2');
+						break;
+					case 'l4d2':
+						$row['typeName']	= 'Left 4 Dead 2';
+						$row['typeAlt']	= 'l4d2';
+						$row['type']		= $this->getIconThumbs('l4d2');
+						break;
+					case 'csgo':
+						$row['typeName']	= 'Counter-Strike: Global Offensive';
+						$row['typeAlt']	= 'csgo';
+						$row['type']		= $this->getIconThumbs('csgo');
+						break;
+					default:
+						$row['typeName']	= 'Unnamed';
+						$row['typeAlt']	= 'un';
+						$row['type']		= "https://i.imgur.com/y5JxuIt.png";
+						break;
+				}
+				$data[] = $row;
+			}
+
+			if (count($data) == 0) {
+				$data['error'] = 0;
+			}
+
+			return $this->output($data);
+
+		} catch (\Exception $e) {
+			\IPS\Log::log($e, 'dfreportplayers_mysql_issue');
+			$data['error'] = 1;
+
+			return $this->output($data);
+		}
+	}
+
+	public static function toCommunityId($id)
+	{
+		if (preg_match('/^STEAM_/', $id)) {
+			$parts = explode(':', $id);
+			return bcadd(bcadd(bcmul($parts[2], '2'), '76561197960265728'), $parts[1]);
+		} elseif (is_numeric($id) && strlen($id) < 16) {
+			return bcadd($id, '76561197960265728');
+		} else {
+			return $id;
+		}
+	}
+
+	public static function censorWords($msg)
+	{
+		return str_replace([
+			'kurw',
+			'huj',
+			'jeba',
+			'skurw',
+			'kutas',
+			'cip',
+			'cwel',
+			'peda',
+			'suka',
+			'jeban',
+			'dupa',
+			'cunt',
+			'nigger',
+			'pussy',
+			'gay',
+			'lesbian',
+			'dick',
+		], "***", strip_tags($msg));
+	}
+
+	public static function strip_html_tags($msg)
+	{
+		return preg_replace("/<([a-z][a-z0-9]*)[^>]*?(\/?)>/si", '', $msg);
+	}
+
+	public static function removeInvalidCharacters($msg)
+	{
+		$msg = self::strip_html_tags(preg_replace('/\p{Thai}/u', '.', $msg));
+		return mb_strlen($msg) < 2 ? '...' : $msg;
+	}
+
+	public static function skipAdvert($msg)
+	{
+		if (
+			preg_match('/[0-9]{2,3}.[0-9]{2,3}.[0-9]{2,3}.[0-9]{2,3}(:[0-9]{4,8})?/', $msg) ||
+			preg_match('/(http[s]?\:\/\/)?(?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63}/', $msg)
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	public static function getIconThumbs($game)
+	{
+		switch ($game) {
+			case 'cs16':
+				$Type = "cs";
+				break;
+			case 'l4d2':
+				$Type = "l4d2";
+				break;
+			case 'cssource':
+				$Type = "css";
+				break;
+			case 'tf2':
+				$Type = "tf2";
+				break;
+			default:
+				$Type = $game;
+				break;
+		}
+
+		$Url = 'https://www.gametracker.com/images/game_icons16';
+		$iconThumb = \IPS\Http\Url::external("{$Url}/{$Type}.png")->request()->get()->httpResponseCode == 200 ? \IPS\Http\Url::external("{$Url}/{$Type}.png") : NULL;
+
+		return (string) $iconThumb;
+	}
+}]]></widget></widgets><htmlFiles><html filename="dfreportplayersWidget.phtml">PGlwczp0ZW1wbGF0ZSBwYXJhbWV0ZXJzPSIkZGF0YSIgLz4NCjxoMyBjbGFzcz0naXBzV2lkZ2V0X3RpdGxlIGlwc1R5cGVfcmVzZXQnPg0KCXtsYW5nPSJkZnJlcG9ydHBsYXllcnNfdGl0bGUifQ0KPC9oMz4NCjxkaXYgY2xhc3M9J2lwc1dpZGdldF9pbm5lciBkZnJlcG9ydHBsYXllcnNEaXYnPg0KCTx1bCBjbGFzcz0naXBzRGF0YUxpc3QgaXBzRGF0YUxpc3RfcmVkdWNlZFNwYWNpbmcnPg0KCQl7e2lmICFlbXB0eSgkZGF0YVsnZXJyb3InXSl9fQ0KCQk8bGkgY2xhc3M9J2lwc0RhdGFJdGVtIGRmcmVwb3J0cGxheWVyc1BhZCc+DQoJCQk8ZGl2IGNsYXNzPSdpcHNMaXN0X2lubGluZSc+DQoJCQkJe3tpZiAkZGF0YVsnZXJyb3InXSA9PSAwfX0NCiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3M9Imlwc1R5cGVfaXNzdWUiPntsYW5nPSJkZnJlcG9ydHBsYXllcnNfZXJyb3Jfbm9fcGxheWVycyJ9PC9zcGFuPg0KICAgICAgICAgICAgICAgIHt7ZWxzZX19DQogICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzPSJpcHNUeXBlX3dhcm5pbmciPntsYW5nPSJkZnJlcG9ydHBsYXllcnNfZXJyb3JfbXlzcWwifTwvc3Bhbj4NCiAgICAgICAgICAgICAgICB7e2VuZGlmfX0NCgkJCTwvZGl2Pg0KCQk8L2xpPg0KCTwvdWw+DQoJe3tlbHNlfX0NCgkJPHVsIGNsYXNzPSdpcHNEYXRhTGlzdCBpcHNEYXRhTGlzdF9yZWR1Y2VkU3BhY2luZyc+DQoJCQl7e2ZvcmVhY2ggJGRhdGEgYXMgJHJvd319DQoJCQk8bGkgY2xhc3M9J2lwc0RhdGFJdGVtIGRmcmVwb3J0cGxheWVyc1BhZCc+DQoJCQkJPHNwYW4gY2xhc3M9J2lwc1Bvc19yaWdodCBpcHNUeXBlX3NtYWxsIGlwc0JhZGdlIGlwc0JhZGdlX25lZ2F0aXZlJz4NCiAgICAgICAgICAgICAgICAgICAgPGkgY2xhc3M9ImZhcyBmYS1jbG9jayI+PC9pPiB7ZGF0ZXRpbWU9IiRyb3dbJ3RpbWUnXSJ9DQogICAgICAgICAgICAgICAgPC9zcGFuPg0KCQkJCTxkaXYgY2xhc3M9J2lwc0xpc3RfaW5saW5lJz4NCgkJCQkJPGltZyBzcmM9Inskcm93Wyd0eXBlJ119IiBhbHQ9Inskcm93Wyd0eXBlQWx0J119IiBkYXRhLWlwc3Rvb2x0aXA9IiIgX3RpdGxlPSJ7JHJvd1sndHlwZU5hbWUnXX0iPg0KCQkJCQk8c3Ryb25nPjxhIGhyZWY9Imh0dHBzOi8vc3RlYW1jb21tdW5pdHkuY29tL3Byb2ZpbGVzL3skcm93WydjbGllbnRfc3RlYW1pZCddfSIgdGFyZ2V0PSJfYmxhbmsiIGRhdGEtaXBzdG9vbHRpcD0iIiBfdGl0bGU9IntsYW5nPSJkZnJlcG9ydHBsYXllcnNfdmlzaXRfcHJvZmlsZV9zdGVhbSJ9IHskcm93WydjbGllbnRfbmFtZSddfSI+DQoJCQkJCXskcm93WydjbGllbnRfbmFtZSddfTwvYT48L3N0cm9uZz4ge2xhbmc9ImRmcmVwb3J0cGxheWVyc19yZXBvcnRfcGxheWVyIn0gDQoJCQkJCTxzdHJvbmc+PGEgaHJlZj0iaHR0cHM6Ly9zdGVhbWNvbW11bml0eS5jb20vcHJvZmlsZXMveyRyb3dbJ3RhcmdldF9zdGVhbWlkJ119IiB0YXJnZXQ9Il9ibGFuayIgZGF0YS1pcHN0b29sdGlwPSIiIF90aXRsZT0ie2xhbmc9ImRmcmVwb3J0cGxheWVyc192aXNpdF9wcm9maWxlX3N0ZWFtIn0geyRyb3dbJ3RhcmdldF9uYW1lJ119Ij4NCgkJCQkJeyRyb3dbJ3RhcmdldF9uYW1lJ119PC9hPjwvc3Ryb25nPg0KICAgICAgICAgICAgICAgICAgICB7bGFuZz0iZGZyZXBvcnRwbGF5ZXJzX3JlcG9ydF9wbGF5ZXJfZm9yIn0gDQoJCQkJCTxzdHJvbmc+eyRyb3dbJ3JlcG9ydF9yZWFzb24nXX08L3N0cm9uZz4ge2xhbmc9ImRmcmVwb3J0cGxheWVyc19yZXBvcnRfc2VydmVyIn0gIDxzdHJvbmc+eyRyb3dbJ3NlcnZlcl9uYW1lJ119PC9zdHJvbmc+DQoJCQkJPC9kaXY+DQoJCQk8L2xpPg0KCQkJe3tlbmRmb3JlYWNofX0NCgkJPC91bD4NCgkJe3tlbmRpZn19DQo8L2Rpdj4=</html></htmlFiles><cssFiles><css filename="dfreportplayers.css">LmRmcmVwb3J0cGxheWVyc0RpdiB7DQoJbWF4LWhlaWdodDogMjQ1cHg7DQoJb3ZlcmZsb3cteTogYXV0bzsNCn0NCg0KLmRmcmVwb3J0cGxheWVyc1BhZCB7DQoJcGFkZGluZzogMTBweDsNCn0NCg0KLmRmcmVwb3J0cGxheWVyc1BhZCBpbWcgew0KICAgIG1hcmdpbi1yaWdodDogMTVweDsNCn0=</css></cssFiles><jsFiles/><resourcesFiles/><lang><word key="block_dfreportplayersWidget" js="0">Report players</word><word key="block_dfreportplayersWidget_desc" js="0">Widget block with reported players from servers</word><word key="dfreportplayers_general" js="0">General</word><word key="dfreportplayers_canView" js="0">Groups allowed to view</word><word key="dfreportplayers_host" js="0">MySQL host</word><word key="dfreportplayers_user" js="0">MySQL user</word><word key="dfreportplayers_password" js="0">MySQL user password</word><word key="dfreportplayers_database" js="0">MySQL database</word><word key="dfreportplayers_limit" js="0">Reports limit to show</word><word key="dfreportplayers_title" js="0">Report players</word><word key="dfreportplayers_visit_profile_steam" js="0">Go to profile</word><word key="dfreportplayers_report_player" js="0">report player</word><word key="dfreportplayers_report_player_for" js="0">for</word><word key="dfreportplayers_report_server" js="0">on server</word><word key="dfreportplayers_error_mysql" js="0">MySQL Connection Error!</word><word key="dfreportplayers_error_no_players" js="0">No players found!</word></lang><versions><version long="10000" human="1.0.0"><![CDATA[//<?php
+
+
+/* To prevent PHP errors (extending class does not exist) revealing path */
+if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
+{
+	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+	exit;
+}
+
+/**
+ * Install Code
+ */
+class ips_plugins_setup_install
+{
+	/**
+	 * ...
+	 *
+	 * @return	array	If returns TRUE, upgrader will proceed to next step. If it returns any other value, it will set this as the value of the 'extra' GET parameter and rerun this step (useful for loops)
+	 */
+	public function step1()
+	{
+		
+
+		return TRUE;
+	}
+	
+	// You can create as many additional methods (step2, step3, etc.) as is necessary.
+	// Each step will be executed in a new HTTP request
+}]]></version></versions></plugin>
