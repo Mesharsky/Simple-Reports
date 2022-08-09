@@ -15,6 +15,10 @@
 		"#format" "{1:s},{2:s}"
 		"en"	"Select Report Reason{1}Player that will be reported [ {2} ]"
 	}
+	"Custom Reason"
+	{
+		"en"	"Custom Reason"
+	}
 	
 	"Input Custom Reason"
 	{

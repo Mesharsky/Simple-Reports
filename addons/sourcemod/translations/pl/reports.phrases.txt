@@ -15,6 +15,10 @@
 		"#format" "{1:s},{2:s}"
 		"pl"	"Wybierz Powód Zgłoszenia{1}Gracz który zostanie zgłoszony [ {2} ]"
 	}
+	"Custom Reason"
+	{
+		"pl"	"Własny Powód"
+	}
 	
 	"Input Custom Reason"
 	{

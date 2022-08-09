@@ -270,9 +270,13 @@ public void CreateReasonsMenu(int client, int target)
 		
 		menu.AddItem("", report_reasons);
 	}
-	
+
 	if (g_ReportCustomReason == true)
-		menu.AddItem("custom_reason", "Custom Reason");
+	{
+		char buffer[32];
+		Format(buffer, sizeof(buffer), "%t", "Custom Reason", client);
+		menu.AddItem("custom_reason", buffer);
+	}
 	
 	menu.Display(client, MENU_TIME_FOREVER);
 }
