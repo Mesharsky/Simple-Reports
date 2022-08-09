@@ -68,7 +68,9 @@ My friend made plugin integration with **Invision Community CMS Forum Software**
 ### EXTENSIONS AND CUSTOM PLUGINS/INCLUDES USED
 
 SMJansson Extension: [CLICK HERE](https://forums.alliedmods.net/showthread.php?t=184604 "CLICK HERE")
+
 Discord Api Plugin: [CLICK HERE](https://github.com/Deathknife/sourcemod-discord "CLICK HERE")
+
 Multicolors Include: [CLICK HERE](https://forums.alliedmods.net/showthread.php?t=247770 "CLICK HERE")
 
 ------------
