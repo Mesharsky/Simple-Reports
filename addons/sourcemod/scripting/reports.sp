@@ -1,8 +1,10 @@
 /*	Copyright (C) 2022 Mesharsky
+
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
+	
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,7 +22,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.0.0"
+#define PLUGIN_VERSION "2.0.1"
 
 #define REPORT_REASONS_SIZE 128
 #define DISCORD_ROLE_ID_SIZE 128
@@ -89,7 +91,7 @@ bool g_WaitingForCustomReason[MAXPLAYERS + 1];
 
 public Plugin myinfo = 
 {
-	name = "Advanced Report System", 
+	name = "Simple Report System", 
 	author = "Mesharsky", 
 	description = "Allows players to report people on the server with reasons that will be sent to admin", 
 	version = PLUGIN_VERSION, 
@@ -173,10 +175,10 @@ bool Database_Init(const char[] databaseName)
 public Action Command_ReloadConfig(int client, int args)
 {
 	if (LoadConfig(false))
-		ReplyToCommand(client, "[ Reports ] Config has been reloaded");
+		CReplyToCommand(client, "%sConfig has been reloaded", g_ReportsData.chat_prefix);
 	else
 	{
-		ReplyToCommand(client, "[ Reports ] There is some problem with reloading config file. Check for error logs");
+		CReplyToCommand(client, "%shere is some problem with reloading config file. Check for error logs", g_ReportsData.chat_prefix);
 		SetFailState("Failed to reload config file.");
 	}	
 	
@@ -198,6 +200,9 @@ public Action Command_ReportMenu(int client, int args)
 	{
 		if (!IsClientConnected(i) || IsFakeClient(i))
 			continue;
+
+		if (i == client)
+			continue;	
 		
 		GetClientName(i, display, sizeof(display));
 		IntToString(GetClientUserId(i), userId, sizeof(userId));
@@ -334,13 +339,19 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 	if (!g_WaitingForCustomReason[client])
 		return Plugin_Continue;
 
-	if (sArgs[0])
+	int len = strlen(sArgs) + 1;
+	char[] buffer = new char[len];
+
+	strcopy(buffer, len, sArgs);
+	TrimString(buffer);
+
+	if (!buffer[0])
 	{
 		CPrintToChat(client, "%s %t", g_ReportsData.chat_prefix, "Entered Reason Is Empty");
 		return Plugin_Handled;
 	}	
 	
-	if (strlen(sArgs) > MAX_REPORT_LENGTH)
+	if (strlen(buffer) > MAX_REPORT_LENGTH)
 	{
 		CPrintToChat(client, "%s %t", g_ReportsData.chat_prefix, "Entered Reason Too Long");
 		return Plugin_Handled;
@@ -350,7 +361,7 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 	
 	int target = GetClientOfUserId(g_ReportTarget[client]);
 	if (target != 0)
-		ProcessReport(client, target, sArgs);
+		ProcessReport(client, target, buffer);
 	else
 	{
 		CPrintToChat(client, "%s %t", g_ReportsData.chat_prefix, "Invalid Target Index");
@@ -371,7 +382,7 @@ void ProcessReport(int client, int reported_client, const char[] report_reason)
 
 		GetClientName(client, report.client_name, sizeof(DiscordReportData::client_name));
 		GetClientName(reported_client, report.reported_name, sizeof(DiscordReportData::reported_name));
-		
+
 		GetClientAuthId(client, AuthId_SteamID64, report.client_auth, sizeof(DiscordReportData::client_auth));
 		GetClientAuthId(reported_client, AuthId_SteamID64, report.reported_auth, sizeof(DiscordReportData::reported_auth));
 		
@@ -442,7 +453,6 @@ void DiscordSendData(DiscordReportData report)
 	if (g_DiscordData.message_type == 1) // embed
 	{
 		FormatDiscordMessage(true, report, mentions, message, sizeof(message));
-		PrintToServer(message);
 		
 		MessageEmbed Embed = new MessageEmbed();
 		hook.SlackMode = true;
@@ -679,26 +689,6 @@ void Config_GetDiscordMessage(KeyValues kv)
     kv.GoBack(); // Go back to Discord Integration
 }
 
-stock void ForceAppendNewLine(char[] str, int size)
-{
-    int index = Format(str, size, "%s\n", str);
-
-    --index;
-    if (index > 0 && index < size)
-        str[index] = '\n';
-}
-
-stock void RemoveLastNewLine(char[] str, int size)
-{
-    int len = strlen(str);
-    if (len >= size)
-        ThrowError("String is larger than size");
-    
-    --len;
-    if (len >= 0 && str[len] == '\n')
-    	str[len] = '\0';
-}
-
 void Config_GetDiscordMentionRoles(KeyValues kv)
 {
 	if (!kv.JumpToKey("Mention Roles"))
@@ -793,12 +783,32 @@ void GetServerIp(char[] output, int size)
 		port);
 }
 
-bool IsClientAdmin(int client)
+stock void ForceAppendNewLine(char[] str, int size)
 {
-	return CheckCommandAccess(client, "reports_admin", ADMFLAG_BAN);
+    int index = Format(str, size, "%s\n", str);
+
+    --index;
+    if (index > 0 && index < size)
+        str[index] = '\n';
+}
+
+stock void RemoveLastNewLine(char[] str, int size)
+{
+    int len = strlen(str);
+    if (len >= size)
+        ThrowError("String is larger than size");
+    
+    --len;
+    if (len >= 0 && str[len] == '\n')
+    	str[len] = '\0';
 }
 
 stock bool QueryErrored(Database db, DBResultSet results, const char[] error)
 {
 	return (db == null || results == null || error[0] != '\0');
+}
+
+bool IsClientAdmin(int client)
+{
+	return CheckCommandAccess(client, "reports_admin", ADMFLAG_BAN);
 }
