@@ -27,6 +27,10 @@
 #define MAX_REPORT_LENGTH 64
 #define MAX_DISCORD_MSG_SIZE 1024
 
+#if !defined MAX_AUTHID_LENGTH
+#define MAX_AUTHID_LENGTH 64
+#endif
+
 enum struct ReportsData
 {
 	bool admin_notify;
@@ -59,9 +63,11 @@ enum struct DiscordData
 
 enum struct DiscordReportData
 {
+	int client;
 	char client_name[MAX_NAME_LENGTH];
 	char client_auth[MAX_AUTHID_LENGTH];
 
+	int reported_client;
 	char reported_name[MAX_NAME_LENGTH];
 	char reported_auth[MAX_AUTHID_LENGTH];
 	char report_reason[REPORT_REASONS_SIZE];
@@ -166,11 +172,12 @@ bool Database_Init(const char[] databaseName)
 
 public Action Command_ReloadConfig(int client, int args)
 {
-	if (LoadConfig())
+	if (LoadConfig(false))
 		ReplyToCommand(client, "[ Reports ] Config has been reloaded");
 	else
 	{
 		ReplyToCommand(client, "[ Reports ] There is some problem with reloading config file. Check for error logs");
+		SetFailState("Failed to reload config file.");
 	}	
 	
 	return Plugin_Handled;
@@ -358,7 +365,10 @@ void ProcessReport(int client, int reported_client, const char[] report_reason)
 	if (g_ReportCooldown[client] == 0 || g_ReportCooldown[client] <= GetTime())
 	{
 		DiscordReportData report;
-		
+
+		report.client = client;
+		report.reported_client = reported_client;
+
 		GetClientName(client, report.client_name, sizeof(DiscordReportData::client_name));
 		GetClientName(reported_client, report.reported_name, sizeof(DiscordReportData::reported_name));
 		
@@ -473,21 +483,31 @@ void FormatDiscordMessage(
 	char ip[32];
 	GetServerIp(ip, sizeof(ip));
 	
-	char profile[64];
+	char buffer[MAX_AUTHID_LENGTH];
 	
 	ReplaceString(output, size, "{server_name}", g_ReportsData.server_name);
 	ReplaceString(output, size, "{server_ip}", ip);
 	
 	ReplaceString(output, size, "{client_name}", report.client_name);
-	MakeProfileLinkString(isEmbed, report.client_auth, profile, sizeof(profile));
-	ReplaceString(output, size, "{client_profile}", profile);
-	ReplaceString(output, size, "{client_auth}", report.client_auth);
+	MakeProfileLinkString(isEmbed, report.client_auth, buffer, sizeof(buffer));
+	ReplaceString(output, size, "{client_profile}", buffer);
+	ReplaceString(output, size, "{client_steamid64}", report.client_auth);
+
+	GetClientAuthId(report.client, AuthId_Steam3, buffer, sizeof(buffer));
+	ReplaceString(output, size, "{client_steamid3}", buffer);
+	GetClientAuthId(report.client, AuthId_Steam2, buffer, sizeof(buffer));
+	ReplaceString(output, size, "{client_steamid2}", buffer);
 	
 	ReplaceString(output, size, "{reported_name}", report.reported_name);
-	MakeProfileLinkString(isEmbed, report.reported_auth, profile, sizeof(profile));
-	ReplaceString(output, size, "{reported_profile}", profile);
-	ReplaceString(output, size, "{reported_auth}", report.reported_auth);
-	
+	MakeProfileLinkString(isEmbed, report.reported_auth, buffer, sizeof(buffer));
+	ReplaceString(output, size, "{reported_profile}", buffer);
+	ReplaceString(output, size, "{reported_steamid64}", report.reported_auth);
+
+	GetClientAuthId(report.reported_client, AuthId_Steam3, buffer, sizeof(buffer));
+	ReplaceString(output, size, "{reported_steamid3}", buffer);
+	GetClientAuthId(report.reported_client, AuthId_Steam2, buffer, sizeof(buffer));
+	ReplaceString(output, size, "{reported_steamid2}", buffer);
+
 	ReplaceString(output, size, "{report_reason}", report.report_reason);
 	ReplaceString(output, size, "{mentions_list}", mentions);
 }
@@ -536,7 +556,7 @@ public void ProcessReportPost(Database db, DBResultSet results, const char[] err
 	}
 }
 
-void LoadConfig()
+bool LoadConfig(bool fatalError = true)
 {
 	KeyValues kv = new KeyValues("Reports");
 	
@@ -544,13 +564,23 @@ void LoadConfig()
 	BuildPath(Path_SM, path, sizeof(path), "configs/reports.cfg");
 	
 	if (!kv.ImportFromFile(path))
-		SetFailState("Can't find config file: %s", path);
+	{
+		if (fatalError)
+			SetFailState("Can't find config file: %s", path);
+		else
+		{
+			LogError("Can't find config file: %s", path);
+			delete kv;
+			return false;
+		}
+	}
 	
 	Config_GetMainData(kv);
 	Config_GetReportReasons(kv);
 	Config_GetDiscordData(kv);
 	
 	delete kv;
+	return true;
 }
 
 void Config_GetMainData(KeyValues kv)
