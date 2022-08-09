@@ -76,6 +76,10 @@ The plugin can be found in the `web_addons` folder in the repository along with 
 [MultiColors](https://forums.alliedmods.net/showthread.php?t=247770 "MultiColors")  *(included in the repository)*
 
 ------------
+### LANGUAGE SUPPORT
+Currently only Polish and English have translations, if you make one for another language let me know so I can add it to the plugin.
+
+------------
 ### CREDITS
 
 [Thrawn2](https://forums.alliedmods.net/member.php?u=51683 "Thrawn2") - Extension used in the plugin.  
