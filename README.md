@@ -1,48 +1,51 @@
 ## Simple Reports Plugin
 
-This simple plugin allows to report players on the server and store that data in MySQL.
-Also there is built in Discord Integration that allows server admins to react faster for the reports.
+A simple player reporting plugin that stores reports in a MySQL database, with Discord integration to help server admins to react faster to the reports.  
 
 ------------
 
-| SUPPORTED GAMES  |   | SUPPORTED SM VERSIONS |  |
-| ------------ | ------------ | ------------ | ------------ |
-|  CSGO |  ✅ | SM 1.10+ | ✅ |
-|  CS:SOURCE |  ✅ | SM 1.10+ | ✅ |
-|  TEAM FORTRESS 2 | ✅  | SM 1.10+ | ✅ |
-|  LEFT 4 DEAD 2 |  ✅ | SM 1.10+ | ✅ |
+| Supported Games | Minimum SourceMod Version |
+| ------------ | ------------ |
+|  CS:GO | SM 1.10+ |
+|  CS:Source | SM 1.10+ |
+|  Team Fortress 2  | SM 1.10+ |
+|  Left 4 Dead 2 | SM 1.10+ |
 
-**More games might work as well but their gametype will be marked as unknown in database**
-**If you test other games and it will work properly. Let me know so i can add official support for it!**
+*Other games should still work, but their gametype will be marked as unknown in the database.*  
+*If you test other games and they work properly, let me know so I can add official support for it!*  
 
 ------------
 ### FEATURES
 
 - An extensive and eye-catching configuration file.
-- MySQL support to store Reports with all the data.
-- MultiLang support.
-- Admin notification on the server + Sound.
-- Reports cooldown in seconds (configurable).
-- Full Discord Integration (Embed + Normal Messages). Fully configurable through configuration file + A lot options for discord messages.
+- MySQL database support to store reports.
+- SourceMod translations support (currently only *Polish* and *English* have translations).
+- In-game admin notification (with optional sound).
+- Full Discord Integration (Embed + Normal Messages). Fully configurable through configuration file, with completely customiseable message text.
 ------------
 ### COMMANDS
-- !report - Main Report Menu.
-- !reloadreports - Reload Configuration File (Reuries: Admin_Root permission).
+| Command | Description |
+| ------------ | ------------ |
+| **!report** | Main Report Menu. |
+| **!reloadreports** | Reload Configuration File *(requires root flag)*. |  
+
 ------------
 ### HOW TO CONFIGURE
 
-Please read the documentation in the config file
-
-Link: [CLICK HERE](https://github.com/Mesharsky/Simple-Reports/blob/main/addons/sourcemod/configs/reports.cfg "CLICK HERE")
+Read the documentation inside [the config file.](https://github.com/Mesharsky/Simple-Reports/blob/main/addons/sourcemod/configs/reports.cfg "Config File")
 
 ------------
 ### INSTALLATION
 
-Download latest release from here: [CLICK HERE](https://github.com/Mesharsky/Simple-Reports/releases "CLICK HERE")
-All the extensions and required plugins are in the zip file provided.
+Download the latest release [from here.](https://github.com/Mesharsky/Simple-Reports/releases "Latest Release")  
 
-1. Upload all files to root directory of your server (Guide how to install plugins: [CLICK HERE](https://wiki.alliedmods.net/Managing_your_sourcemod_installation#Installing_Plugins "CLICK HERE")) Make sure discord_api plugin and smjansson extension are also uploaded (Otherwise plugin will not work)
-2. This plugin **requires MySQL Database**. To se it up please navigate to: **addons/sourcemod/configs/databases.cfg** and create a database connection tree like below:
+All the extensions and required plugins are in the zip file provided.  
+
+1. Upload all files to root directory of your server ([How to install plugins](https://wiki.alliedmods.net/Managing_your_sourcemod_installation#Installing_Plugins "Installing Plugins"))  
+Make sure `discord_api` plugin and `smjansson` extension are also uploaded (both are required).  
+
+2. This plugin **requires a MySQL Database**. You will need to add the connection into  
+`addons/sourcemod/configs/databases.cfg` like below:
 
 ```
 	"reports"
@@ -54,31 +57,28 @@ All the extensions and required plugins are in the zip file provided.
 		"pass"				"database password"
 	}
 ```
-3. Configure plugin settings in the configuration file which is in: **addons/sourcemod/configs/reports.cfg** (Guide and comments are arleady in the configuration file).
+3. Configure plugin settings in the configuration file: `addons/sourcemod/configs/reports.cfg`
 
-#### How to get webhook for discord channel?
-Please follow the official discord guide how to get your WebHook for discord channel: [CLICK HERE](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks "CLICK HERE")
+#### "How do I get the discord channel webhook?"
+Please follow the official discord guide on [how to get your WebHook for discord channel.](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks "Intro to WebHooks")
 
 ------------
 ### WEB ADDONS
 
-My friend made plugin integration with **Invision Community CMS Forum Software**. Plugin can be found in **web_addons** folder in the repository along with installation instructions.
+My friend made plugin integration with **Invision Community CMS Forum Software**.  
+The plugin can be found in the `web_addons` folder in the repository along with installation instructions.
 
 ------------
-### EXTENSIONS AND CUSTOM PLUGINS/INCLUDES USED
+### EXTENSIONS/LIBRARIES/INCLUDES USED
 
-SMJansson Extension: [CLICK HERE](https://forums.alliedmods.net/showthread.php?t=184604 "CLICK HERE")  
-Discord Api Plugin: [CLICK HERE](https://github.com/Deathknife/sourcemod-discord "CLICK HERE")  
-Multicolors Include: [CLICK HERE](https://forums.alliedmods.net/showthread.php?t=247770 "CLICK HERE")  
+[SMJansson](https://forums.alliedmods.net/showthread.php?t=184604 "SMJansson")  
+[Discord API](https://github.com/Deathknife/sourcemod-discord "Discord API")  
+[MultiColors](https://forums.alliedmods.net/showthread.php?t=247770 "MultiColors")  *(included in the repository)*
 
 ------------
 ### CREDITS
 
-Thrawn2 - Extension used in the plugin: [LINK TO PROFILE](https://forums.alliedmods.net/member.php?u=51683 "LINK TO PROFILE")  
-Deathknife - Discord Api Plugin: [LINK TO PROFILE](https://github.com/Deathknife "LINK TO PROFILE")  
-Bara - Multicolors Include: [LINK TO PROFILE](https://forums.alliedmods.net/member.php?u=178115 "PROFILE")  
-Digby - Huge help and tips how to write better code lol: [LINK TO PROFILE](https://github.com/sirdigbot/ "LINK TO PROFILE")  
-
-
-
-
+[Thrawn2](https://forums.alliedmods.net/member.php?u=51683 "Thrawn2") - Extension used in the plugin.  
+[Deathknife](https://github.com/Deathknife "Deathknife") - Discord Api Plugin.  
+[Bara](https://forums.alliedmods.net/member.php?u=178115 "Bara") - Multicolors Include.  
+[Digby](https://github.com/sirdigbot/ "dude who makes plugins in 3 hours") - Huge help and tips how to write better code lol.
