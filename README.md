@@ -67,19 +67,17 @@ My friend made plugin integration with **Invision Community CMS Forum Software**
 ------------
 ### EXTENSIONS AND CUSTOM PLUGINS/INCLUDES USED
 
-SMJansson Extension: [CLICK HERE](https://forums.alliedmods.net/showthread.php?t=184604 "CLICK HERE")
-
-Discord Api Plugin: [CLICK HERE](https://github.com/Deathknife/sourcemod-discord "CLICK HERE")
-
-Multicolors Include: [CLICK HERE](https://forums.alliedmods.net/showthread.php?t=247770 "CLICK HERE")
+SMJansson Extension: [CLICK HERE](https://forums.alliedmods.net/showthread.php?t=184604 "CLICK HERE")  
+Discord Api Plugin: [CLICK HERE](https://github.com/Deathknife/sourcemod-discord "CLICK HERE")  
+Multicolors Include: [CLICK HERE](https://forums.alliedmods.net/showthread.php?t=247770 "CLICK HERE")  
 
 ------------
 ### CREDITS
 
-Thrawn2 - Extension used in the plugin: [LINK TO PROFILE](https://forums.alliedmods.net/member.php?u=51683 "LINK TO PROFILE")
-Deathknife - Discord Api Plugin: [LINK TO PROFILE](https://github.com/Deathknife "LINK TO PROFILE")
-Bara - Multicolors Include: [LINK TO PROFILE](https://forums.alliedmods.net/member.php?u=178115 "PROFILE")
-Digby - Huge help and tips how to write better code lol: [LINK TO PROFILE](https://github.com/sirdigbot/ "LINK TO PROFILE")
+Thrawn2 - Extension used in the plugin: [LINK TO PROFILE](https://forums.alliedmods.net/member.php?u=51683 "LINK TO PROFILE")  
+Deathknife - Discord Api Plugin: [LINK TO PROFILE](https://github.com/Deathknife "LINK TO PROFILE")  
+Bara - Multicolors Include: [LINK TO PROFILE](https://forums.alliedmods.net/member.php?u=178115 "PROFILE")  
+Digby - Huge help and tips how to write better code lol: [LINK TO PROFILE](https://github.com/sirdigbot/ "LINK TO PROFILE")  
 
 
 
