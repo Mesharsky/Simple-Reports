@@ -22,7 +22,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.0.1"
+#define PLUGIN_VERSION "2.0.2"
 
 #define REPORT_REASONS_SIZE 128
 #define DISCORD_ROLE_ID_SIZE 128
