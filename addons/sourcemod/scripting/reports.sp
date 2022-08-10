@@ -43,6 +43,8 @@ enum struct ReportsData
 	char chat_prefix[64];
 	
 	int reports_cooldown;
+
+	char blocked_chars[64];
 }
 
 enum struct DiscordData
@@ -198,7 +200,7 @@ public Action Command_ReportMenu(int client, int args)
 	
 	for (int i = 1; i < MaxClients; ++i)
 	{
-		if (!IsClientConnected(i) || IsFakeClient(i))
+		if (!IsClientAuthorized(i) || IsFakeClient(i))
 			continue;
 
 		if (i == client)
@@ -360,9 +362,19 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 		CPrintToChat(client, "%s %t", g_ReportsData.chat_prefix, "Entered Reason Too Long");
 		return Plugin_Handled;
 	}
+
+	if (ContainsBlockedCharacters(buffer, ';'))
+	{
+		// TODO Add list of blocked characters to the message
+		CPrintToChat(client, "%s %t", g_ReportsData.chat_prefix, "Contains blocked chars");
+		return Plugin_Handled;
+	}
 	
 	g_WaitingForCustomReason[client] = false;
-	
+
+	if (StrEqual(buffer, "stop", false) || StrEqual(buffer, "cancel", false))
+		return Plugin_Handled;
+
 	int target = GetClientOfUserId(g_ReportTarget[client]);
 	if (target != 0)
 		ProcessReport(client, target, buffer);
@@ -610,7 +622,9 @@ void Config_GetMainData(KeyValues kv)
 	kv.GetString("chat_prefix", g_ReportsData.chat_prefix, sizeof(ReportsData::chat_prefix));
 	
 	g_ReportsData.reports_cooldown = kv.GetNum("reports_cooldown");
-	
+
+	kv.GetString("blocked_characters", g_ReportsData.blocked_chars, sizeof(ReportsData::blocked_chars));
+
 	kv.Rewind();
 }
 
@@ -805,6 +819,41 @@ stock void RemoveLastNewLine(char[] str, int size)
     --len;
     if (len >= 0 && str[len] == '\n')
     	str[len] = '\0';
+}
+
+bool ContainsBlockedCharacters(const char[] str, char separator, bool caseSensitive = true)
+{
+	int semicolons = CountExplodeSegments(g_ReportsData.blocked_chars, separator);
+
+	char split[2];
+	split[0] = separator;
+
+	char[][] exploded = new char[semicolons][5]; // 4-byte chars (utf-8) + null
+	ExplodeString(g_ReportsData.blocked_chars, split, exploded, semicolons, 5);
+
+	for (int i = 0; i < semicolons; ++i)
+	{
+		if (StrContains(str, exploded[i], caseSensitive) != -1)
+			return true;
+	}
+
+	return false;
+}
+
+int CountExplodeSegments(const char[] str, char separator)
+{
+	int len = strlen(str);
+	int count = 0;
+	for (int i = 0; i < len; ++i)
+	{
+		if (str[i] == separator)
+			++count;
+	}
+
+	// If string ends in separator remove it from count
+	if (str[len - 1] == separator)
+		--count;
+	return count;
 }
 
 stock bool QueryErrored(Database db, DBResultSet results, const char[] error)
