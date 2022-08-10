@@ -22,7 +22,7 @@
 	
 	"Input Custom Reason"
 	{
-		"en"	"Enter your reason for reporting in the chat."
+		"en"	"Enter your reason for reporting in the chat. Type \"cancel\" or \"stop\" to abort."
 	}
 	"Entered Reason Too Long"
 	{
@@ -32,6 +32,10 @@
 	{
 		"en"	"Your reason can't be empty"
 	}
+    "Contains blocked chars"
+    {
+        "en"    "Your report reason contains blocked characters."
+    }
 	
 	"Report Successfuly Sent"
 	{
