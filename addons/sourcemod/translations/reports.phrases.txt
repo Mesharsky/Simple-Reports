@@ -36,6 +36,10 @@
     {
         "en"    "Your report reason contains blocked characters."
     }
+	"Cancel Custom Report"
+	{
+        "en"    "Report has been cancelled."
+    }
 	
 	"Report Successfuly Sent"
 	{

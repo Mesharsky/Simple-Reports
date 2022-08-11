@@ -22,7 +22,7 @@
 	
 	"Input Custom Reason"
 	{
-		"en"	"Wpisz swój powód zgłoszenia na czacie. Wpisz \"cancel\" lub \"stop\" by anulować."
+		"pl"	"Wpisz swój powód zgłoszenia na czacie. Wpisz \"cancel\" lub \"stop\" by anulować."
 	}
 	"Entered Reason Too Long"
 	{
@@ -35,6 +35,10 @@
 	"Contains blocked chars"
     {
         "pl"    "Twój powód zgłoszenia zawiera zablokowane frazy/symbole."
+    }
+	"Cancel Custom Report"
+	{
+        "pl"    "Twoje zgłoszenie zostało anulowane"
     }
 	
 	"Report Successfuly Sent"
