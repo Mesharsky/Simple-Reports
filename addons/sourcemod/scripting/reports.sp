@@ -200,11 +200,8 @@ public Action Command_ReportMenu(int client, int args)
 	
 	for (int i = 1; i < MaxClients; ++i)
 	{
-		if (!IsClientAuthorized(i) || IsFakeClient(i))
+		if (!IsClientAuthorized(i) || !IsClientInGame(i) || IsFakeClient(i) || i == client)
 			continue;
-
-		if (i == client)
-			continue;	
 		
 		GetClientName(i, display, sizeof(display));
 		IntToString(GetClientUserId(i), userId, sizeof(userId));
@@ -363,7 +360,7 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 		return Plugin_Handled;
 	}
 
-	if (ContainsBlockedCharacters(buffer, ';'))
+	if (buffer[0] == '!' || buffer[0] == '/' || ContainsBlockedCharacters(buffer, ';'))
 	{
 		// TODO Add list of blocked characters to the message
 		CPrintToChat(client, "%s %t", g_ReportsData.chat_prefix, "Contains blocked chars");
@@ -373,7 +370,10 @@ public Action OnClientSayCommand(int client, const char[] command, const char[] 
 	g_WaitingForCustomReason[client] = false;
 
 	if (StrEqual(buffer, "stop", false) || StrEqual(buffer, "cancel", false))
+	{
+		CPrintToChat(client, "%s %t", g_ReportsData.chat_prefix, "Cancel Custom Report");
 		return Plugin_Handled;
+	}
 
 	int target = GetClientOfUserId(g_ReportTarget[client]);
 	if (target != 0)
