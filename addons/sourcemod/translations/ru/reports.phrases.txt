@@ -1,0 +1,77 @@
+﻿"Phrases"
+{
+	"Reports Menu Title"
+	{
+		"ru"	"Выберите игрока, на которого хотите пожаловаться"
+	}
+	
+	"Invalid Target Index"
+	{
+		"ru"	"Недопустимый индекс для цели"
+	}
+
+	"Reports Reasons Title"
+	{
+		"#format" "{1:s},{2:s}"
+		"ru"	"Выберите причину жалобы {1}Игрок, о которой будет сообщено [ {2} ]"
+	}
+	"Custom Reason"
+	{
+		"ru"	"Другая Причина"
+	}
+	
+	"Input Custom Reason"
+	{
+		"ru"	"Введи свлю причину в чате. Набери cancel или stop для отмены."
+	}
+	"Entered Reason Too Long"
+	{
+		"ru"	"Ты печатал слишком долго"
+	}
+	"Entered Reason Is Empty"
+	{
+		"ru"	"Жалоба не может быть без причины"
+	}
+    "Contains blocked chars"
+    {
+        "ru"    "Твоя жалоба содержит недопустимые символы."
+    }
+	"Cancel Custom Report"
+	{
+        "ru"    "Жалоба отменена."
+    }
+	
+	"Report Successfuly Sent"
+	{
+		"#format" "{1:s}"
+		"ru"	"Твоя жалоба отправлена: {darkred}{1}"
+	}
+	
+	"Report Is On Cooldown"
+	{
+		"#format"	"{1:d}"
+		"ru"		"Ты недавно отправлял репорт. Подожди{green}{1}{yellow} секунд и попробуй еще раз."
+	}
+	
+	"Admin MSG Title"
+	{
+		"ru"		"{yellow}--- {lightred}ВНИМАНИЕ ЖАЛОБА {yellow}---"
+	}
+	
+	"Admin MSG Who Reported"
+	{
+		"#format"	"{1:s}"
+		"ru"		"Кто жалуется: {green}{1}"
+	}
+	
+	"Admin MSG Reported Player"
+	{
+		"#format"	"{1:s}"
+		"ru"		"На кого жалоба: {darkred}{1}"
+	}
+	"Admin MSG Report Reason"
+	{
+		"#format"	"{1:s}"
+		"ru"		"Причина: {purple}{1}"
+	}
+}
