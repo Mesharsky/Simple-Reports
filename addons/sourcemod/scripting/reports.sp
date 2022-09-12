@@ -19,6 +19,8 @@
 #include <multicolors>
 #include <discord>
 
+#tryinclude <sourcebanspp>
+
 #pragma semicolon 1
 #pragma newdecls required
 
@@ -35,6 +37,7 @@
 
 enum struct ReportsData
 {
+	bool sourcebans;
 	bool admin_notify;
 	bool admin_sound;
 	
@@ -443,6 +446,10 @@ void ProcessReport(int client, int reported_client, const char[] report_reason)
 					NotifyAdmin(i, report);
 			}
 		}
+
+		// sourcebans integration
+		if (g_ReportsData.sourcebans)
+			SBPP_ReportPlayer(report.client, report.reported_client, report_reason);
 		
 		g_ReportCooldown[client] = GetTime() + g_ReportsData.reports_cooldown;
 	}
@@ -614,6 +621,7 @@ void Config_GetMainData(KeyValues kv)
 	if (!kv.JumpToKey("Main Configuration"))
 		SetFailState("[ Reports ] Can't process Main Configuration structure");
 	
+	g_ReportsData.sourcebans = view_as<bool>(kv.GetNum("sourcebans_integration"));
 	g_ReportsData.admin_notify = view_as<bool>(kv.GetNum("admin_notification"));
 	g_ReportsData.admin_sound = view_as<bool>(kv.GetNum("admin_notification_sound"));
 	
