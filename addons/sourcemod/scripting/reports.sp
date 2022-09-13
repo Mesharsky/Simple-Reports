@@ -133,6 +133,8 @@ public void OnConfigsExecuted()
 			SetFailState("Failed to connect to database '%s'.", name);
 		PrintToServer("Connected to database: %s", name);
 	}
+
+	IsSourceBansLoaded();
 }
 
 public void OnMapStart()
@@ -449,8 +451,13 @@ void ProcessReport(int client, int reported_client, const char[] report_reason)
 
 		// sourcebans integration
 		if (g_ReportsData.sourcebans)
-			SBPP_ReportPlayer(report.client, report.reported_client, report_reason);
-		
+		{
+			if (GetFeatureStatus(FeatureType_Native, "SBPP_ReportPlayer") == FeatureStatus_Available)
+    			SBPP_ReportPlayer(report.client, report.reported_client, report_reason);
+			else
+    			LogError("[Reports] SourceBans is not loaded/working. Can't send a report"); 
+		}
+
 		g_ReportCooldown[client] = GetTime() + g_ReportsData.reports_cooldown;
 	}
 	else
@@ -753,6 +760,26 @@ void Config_GetDiscordEmbedData(KeyValues kv)
 	kv.GetString("embed_thumbnail_url", g_DiscordData.embed_thmb_url, sizeof(DiscordData::embed_thmb_url));
 	
 	kv.Rewind();
+}
+
+void IsSourceBansLoaded()
+{
+	char path[PLATFORM_MAX_PATH];
+	BuildPath(Path_SM, path, sizeof(path), "plugins/sbpp_report.smx");
+
+	if(g_ReportsData.sourcebans && FileExists(path))
+	{
+		char newPath[PLATFORM_MAX_PATH];
+		BuildPath(Path_SM, newPath, sizeof(newPath), "plugins/disabled/sbpp_report.smx");
+
+		ServerCommand("sm plugins unload sbpp_report");
+
+		if(FileExists(newPath))
+			DeleteFile(newPath);
+
+		RenameFile(newPath, path);
+		LogMessage("SourceBans Reports detected. It has been unloaded and moved into: plugins/disabled/sbpp_report.smx");
+	}		
 }
 
 void PrecacheAndDownloadSound()
