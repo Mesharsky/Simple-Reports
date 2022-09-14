@@ -134,7 +134,7 @@ public void OnConfigsExecuted()
 		PrintToServer("Connected to database: %s", name);
 	}
 
-	IsSourceBansLoaded();
+	DetectSourceBansReportPlugin();
 }
 
 public void OnMapStart()
@@ -452,7 +452,7 @@ void ProcessReport(int client, int reported_client, const char[] report_reason)
 		// sourcebans integration
 		if (g_ReportsData.sourcebans)
 		{
-			if (GetFeatureStatus(FeatureType_Native, "SBPP_ReportPlayer") == FeatureStatus_Available)
+			if (IsSourceBansReportsLoaded())
     			SBPP_ReportPlayer(report.client, report.reported_client, report_reason);
 			else
     			LogError("[Reports] SourceBans is not loaded/working. Can't send a report"); 
@@ -487,6 +487,7 @@ void DiscordSendData(DiscordReportData report)
 		MessageEmbed Embed = new MessageEmbed();
 		hook.SlackMode = true;
 		
+		hook.SetContent(mentions);
 		Embed.SetColor(g_DiscordData.embed_color);
 		Embed.SetThumb(g_DiscordData.embed_thmb_url);
 		Embed.SetTitle(g_DiscordData.embed_title);
@@ -572,6 +573,14 @@ void NotifyAdmin(int admin, DiscordReportData report)
 		EmitSoundToClient(admin, g_ReportsData.admin_sound_path);
 }
 
+bool IsSourceBansReportsLoaded()
+{
+	if (GetFeatureStatus(FeatureType_Native, "SBPP_ReportPlayer") == FeatureStatus_Available)
+    	return true;
+
+	return false;
+}
+
 void MakeMentionsList(ArrayList Mentions, char[] output, int size)
 {
 	char id[DISCORD_ROLE_ID_SIZE];
@@ -629,6 +638,9 @@ void Config_GetMainData(KeyValues kv)
 		SetFailState("[ Reports ] Can't process Main Configuration structure");
 	
 	g_ReportsData.sourcebans = view_as<bool>(kv.GetNum("sourcebans_integration"));
+	if (!IsSourceBansReportsLoaded())
+		g_ReportsData.sourcebans = false;
+
 	g_ReportsData.admin_notify = view_as<bool>(kv.GetNum("admin_notification"));
 	g_ReportsData.admin_sound = view_as<bool>(kv.GetNum("admin_notification_sound"));
 	
@@ -762,7 +774,8 @@ void Config_GetDiscordEmbedData(KeyValues kv)
 	kv.Rewind();
 }
 
-void IsSourceBansLoaded()
+// Well i took this from sourcebans sp.
+void DetectSourceBansReportPlugin()
 {
 	char path[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, path, sizeof(path), "plugins/sbpp_report.smx");
