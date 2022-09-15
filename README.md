@@ -20,6 +20,7 @@ A simple player reporting plugin that stores reports in a MySQL database, with D
 - An extensive and eye-catching configuration file.
 - MySQL database support to store reports.
 - SourceMod translations support (currently only *Polish* and *English* have translations).
+- Sourcebans integration - Sends report to sourcebans database (sb_submissions).
 - In-game admin notification (with optional sound).
 - Block unicode/UTF8 characters from Custom Reason (Customize through configuration file).
 - Full Discord Integration (Embed + Normal Messages). Fully configurable through configuration file, with completely customiseable message text.
