@@ -19,7 +19,9 @@
 #include <multicolors>
 #include <discord>
 
+#undef REQUIRE_PLUGIN
 #tryinclude <sourcebanspp>
+#define REQURE_PLUGIN
 
 #pragma semicolon 1
 #pragma newdecls required
@@ -37,7 +39,7 @@
 
 enum struct ReportsData
 {
-	bool sourcebans;
+	bool useSourcebansReport;
 	bool admin_notify;
 	bool admin_sound;
 	
@@ -118,7 +120,10 @@ public void OnPluginStart()
 	
 	g_ReportReasons = new ArrayList(ByteCountToCells(REPORT_REASONS_SIZE));
 	g_DiscordMentionRoles = new ArrayList(ByteCountToCells(DISCORD_ROLE_ID_SIZE));
-	
+}
+
+public void OnAllPluginsLoaded()
+{
 	LoadConfig();
 }
 
@@ -133,8 +138,6 @@ public void OnConfigsExecuted()
 			SetFailState("Failed to connect to database '%s'.", name);
 		PrintToServer("Connected to database: %s", name);
 	}
-
-	DetectSourceBansReportPlugin();
 }
 
 public void OnMapStart()
@@ -450,12 +453,12 @@ void ProcessReport(int client, int reported_client, const char[] report_reason)
 		}
 
 		// sourcebans integration
-		if (g_ReportsData.sourcebans)
+		if (g_ReportsData.useSourcebansReport)
 		{
 			if (IsSourceBansReportsLoaded())
     			SBPP_ReportPlayer(report.client, report.reported_client, report_reason);
 			else
-    			LogError("[Reports] SourceBans is not loaded/working. Can't send a report"); 
+    			LogError("SourceBans is not loaded/working. Can't send a report"); 
 		}
 
 		g_ReportCooldown[client] = GetTime() + g_ReportsData.reports_cooldown;
@@ -487,7 +490,6 @@ void DiscordSendData(DiscordReportData report)
 		MessageEmbed Embed = new MessageEmbed();
 		hook.SlackMode = true;
 		
-		hook.SetContent(mentions);
 		Embed.SetColor(g_DiscordData.embed_color);
 		Embed.SetThumb(g_DiscordData.embed_thmb_url);
 		Embed.SetTitle(g_DiscordData.embed_title);
@@ -573,14 +575,6 @@ void NotifyAdmin(int admin, DiscordReportData report)
 		EmitSoundToClient(admin, g_ReportsData.admin_sound_path);
 }
 
-bool IsSourceBansReportsLoaded()
-{
-	if (GetFeatureStatus(FeatureType_Native, "SBPP_ReportPlayer") == FeatureStatus_Available)
-    	return true;
-
-	return false;
-}
-
 void MakeMentionsList(ArrayList Mentions, char[] output, int size)
 {
 	char id[DISCORD_ROLE_ID_SIZE];
@@ -600,7 +594,7 @@ public void ProcessReportPost(Database db, DBResultSet results, const char[] err
 {
 	if (QueryErrored(db, results, error))
 	{
-		LogError("[ Reports ] Information could not be saved (error: %s)", error);
+		LogError("Information could not be saved (error: %s)", error);
 		return;
 	}
 }
@@ -629,17 +623,20 @@ bool LoadConfig(bool fatalError = true)
 	Config_GetDiscordData(kv);
 	
 	delete kv;
+
+	UnloadSourcebansReport();
+
 	return true;
 }
 
 void Config_GetMainData(KeyValues kv)
 {
 	if (!kv.JumpToKey("Main Configuration"))
-		SetFailState("[ Reports ] Can't process Main Configuration structure");
+		SetFailState("Can't process Main Configuration structure");
 	
-	g_ReportsData.sourcebans = view_as<bool>(kv.GetNum("sourcebans_integration"));
+	g_ReportsData.useSourcebansReport = view_as<bool>(kv.GetNum("sourcebans_integration"));
 	if (!IsSourceBansReportsLoaded())
-		g_ReportsData.sourcebans = false;
+		g_ReportsData.useSourcebansReport = false;
 
 	g_ReportsData.admin_notify = view_as<bool>(kv.GetNum("admin_notification"));
 	g_ReportsData.admin_sound = view_as<bool>(kv.GetNum("admin_notification_sound"));
@@ -658,11 +655,11 @@ void Config_GetMainData(KeyValues kv)
 void Config_GetReportReasons(KeyValues kv)
 {
 	if (!kv.JumpToKey("Report Reasons"))
-		SetFailState("[ Reports ] Can't process Reports Reasons structure");
+		SetFailState("Can't process Reports Reasons structure");
 	
 	if (!kv.GotoFirstSubKey(false))
     {
-        LogError("[ Reports ] Reasons are empty");
+        LogError("Reasons are empty");
         return;
     }
 	
@@ -690,12 +687,12 @@ void Config_GetReportReasons(KeyValues kv)
 void Config_GetDiscordData(KeyValues kv)
 {
 	if (!kv.JumpToKey("Discord Integration"))
-		SetFailState("[ Reports ] Can't process discord data structure");
+		SetFailState("Can't process discord data structure");
 	
 	g_DiscordData.integration_enabled = view_as<bool>(kv.GetNum("enabled"));
 	kv.GetString("webhook", g_DiscordData.webhook, sizeof(DiscordData::webhook));
 	if (g_DiscordData.integration_enabled && !g_DiscordData.webhook[0])
-		SetFailState("[ Reports ] Webhook can't be empty");
+		SetFailState("Webhook can't be empty");
 	g_DiscordData.message_type = kv.GetNum("message_mode");
 	kv.GetString("bot_name", g_DiscordData.bot_name, sizeof(DiscordData::bot_name));
 	kv.GetString("bot_picture_url", g_DiscordData.profile_url, sizeof(DiscordData::profile_url));
@@ -708,11 +705,11 @@ void Config_GetDiscordData(KeyValues kv)
 void Config_GetDiscordMessage(KeyValues kv)
 {
     if (!kv.JumpToKey("Message Text"))
-        SetFailState("[ Reports ] Can't process Message Text structure");
+        SetFailState("Can't process Message Text structure");
     
     if (!kv.GotoFirstSubKey(false))
     {
-        LogError("[ Reports ] Discord message is empty");
+        LogError("Discord message is empty");
         return;
     }
 
@@ -737,11 +734,11 @@ void Config_GetDiscordMessage(KeyValues kv)
 void Config_GetDiscordMentionRoles(KeyValues kv)
 {
 	if (!kv.JumpToKey("Mention Roles"))
-		SetFailState("[ Reports ] Can't process Mention Roles structure");
+		SetFailState("Can't process Mention Roles structure");
 
 	if (!kv.GotoFirstSubKey(false))
     {
-        LogError("[ Reports ] Mention roles are empty");
+        LogError("Mention roles are empty");
         return;
     }
 	
@@ -763,7 +760,7 @@ void Config_GetDiscordMentionRoles(KeyValues kv)
 void Config_GetDiscordEmbedData(KeyValues kv)
 {
 	if (!kv.JumpToKey("Embed Mode"))
-		SetFailState("[ Reports ] Can't process Embed Mode structure");
+		SetFailState("Can't process Embed Mode structure");
 	
 	kv.GetString("embed_title", g_DiscordData.embed_title, sizeof(DiscordData::embed_title));
 	kv.GetString("embed_field_name", g_DiscordData.embed_field_name, sizeof(DiscordData::embed_field_name));
@@ -775,12 +772,12 @@ void Config_GetDiscordEmbedData(KeyValues kv)
 }
 
 // Well i took this from sourcebans sp.
-void DetectSourceBansReportPlugin()
+void UnloadSourcebansReport()
 {
 	char path[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, path, sizeof(path), "plugins/sbpp_report.smx");
 
-	if(g_ReportsData.sourcebans && FileExists(path))
+	if(g_ReportsData.useSourcebansReport && FileExists(path))
 	{
 		char newPath[PLATFORM_MAX_PATH];
 		BuildPath(Path_SM, newPath, sizeof(newPath), "plugins/disabled/sbpp_report.smx");
@@ -795,13 +792,18 @@ void DetectSourceBansReportPlugin()
 	}		
 }
 
+bool IsSourceBansReportsLoaded()
+{
+	return GetFeatureStatus(FeatureType_Native, "SBPP_ReportPlayer") == FeatureStatus_Available;
+}
+
 void PrecacheAndDownloadSound()
 {
 	// Aparently L4D2 does not support custom sounds or it has different method of doing that.
 	// So let's skip it.
 	if (GetEngineVersion() == Engine_Left4Dead2)
 	{
-		LogError("[ Reports ] L2D2 Game does not support admin sound. This functionality is disabled");
+		LogError("L2D2 Game does not support admin sound. This functionality is disabled");
 		return;
 	}
 	
