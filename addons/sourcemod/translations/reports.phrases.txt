@@ -3,75 +3,92 @@
 	"Reports Menu Title"
 	{
 		"en"	"Choose the player you want to report"
+		"es"	"Elige el jugador que deseas reportar"
 	}
 	
 	"Invalid Target Index"
 	{
 		"en"	"Invalid Index For Target"
+		"es"	"Indice no valido para objetivo"
 	}
 
 	"Reports Reasons Title"
 	{
 		"#format" "{1:s},{2:s}"
 		"en"	"Select Report Reason{1}Player that will be reported [ {2} ]"
+		"es"	"Elige una razon para el reporte{1}Jugador que sera reportado [ {2} ]"
 	}
 	"Custom Reason"
 	{
 		"en"	"Custom Reason"
+		"es"	"Razon Personalizada"
 	}
 	
 	"Input Custom Reason"
 	{
 		"en"	"Enter your reason for reporting in the chat. Type \"cancel\" or \"stop\" to abort."
+		"es"	"Escribe tu razon en el chat. Escribe \"cancel\" o \"stop\" para abortar el reporte."
 	}
 	"Entered Reason Too Long"
 	{
 		"en"	"Your entered reason is too long"
+		"es"	"El motivo ingresado es demasiado largo"
 	}
 	"Entered Reason Is Empty"
 	{
 		"en"	"Your reason can't be empty"
+		"es"	"El motivo de su informe no puede estar vacia"
+		
 	}
     "Contains blocked chars"
     {
         "en"    "Your report reason contains blocked characters."
+	"es"    "El motivo de su informe contiene caracteres bloqueados."
     }
 	"Cancel Custom Report"
 	{
         "en"    "Report has been cancelled."
+	"es"    "El Reporte fue cancelado."
     }
 	
 	"Report Successfuly Sent"
 	{
 		"#format" "{1:s}"
 		"en"	"Your report has been sent for player: {darkred}{1}"
+		"es"	"Su reporte fue enviado para el jugador: {darkred}{1}"
 	}
 	
 	"Report Is On Cooldown"
 	{
 		"#format"	"{1:d}"
 		"en"		"You reported player recently. Please wait {green}{1}{yellow} seconds and try again."
+		"es"		"Reportaste un jugador recientemente. Espera {green}{1}{yellow} segundos y vuelve a intentarlo."
+		
 	}
 	
 	"Admin MSG Title"
 	{
 		"en"		"{yellow}--- {lightred}REPORT NOTIFICATION {yellow}---"
+		"es"		"{yellow}--- {lightred}NOTIFICACION DE REPORTE {yellow}---"
 	}
 	
 	"Admin MSG Who Reported"
 	{
 		"#format"	"{1:s}"
 		"en"		"Report from player: {green}{1}"
+		"es"		"Reporte del jugador: {green}{1}"
 	}
 	
 	"Admin MSG Reported Player"
 	{
 		"#format"	"{1:s}"
 		"en"		"Reported player: {darkred}{1}"
+		"es"		"Jugador reportado: {darkred}{1}"
 	}
 	"Admin MSG Report Reason"
 	{
 		"#format"	"{1:s}"
 		"en"		"Reason: {purple}{1}"
+		"es"		"Razon: {purple}{1}"
 	}
 }
