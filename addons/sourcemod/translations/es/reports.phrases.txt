@@ -1,0 +1,77 @@
+"Phrases"
+{
+	"Reports Menu Title"
+	{
+		"es"	"Elige el jugador que deseas reportar"
+	}
+
+	"Invalid Target Index"
+	{
+		"es"	"Indice no valido para objetivo"
+	}
+
+	"Reports Reasons Title"
+	{
+		"#format" "{1:s},{2:s}"
+		"es"	"Elige una razon para el reporte{1}Jugador que sera reportado [ {2} ]"
+	}
+	"Custom Reason"
+	{
+		"es"	"Razon Personalizada"
+	}
+
+	"Input Custom Reason"
+	{
+		"es"	"Escribe tu razon en el chat. Escribe \"cancel\" o \"stop\" para abortar el reporte."
+	}
+	"Entered Reason Too Long"
+	{
+		"es"	"El motivo ingresado es demasiado largo"
+	}
+	"Entered Reason Is Empty"
+	{
+		"es"	"El motivo de su informe no puede estar vacia"
+	}
+    "Contains blocked chars"
+    {
+        "es"    "El motivo de su informe contiene caracteres bloqueados."
+    }
+	"Cancel Custom Report"
+	{
+        "es"    "El Reporte fue cancelado."
+    }
+
+	"Report Successfuly Sent"
+	{
+		"#format" "{1:s}"
+		"es"	"Su reporte fue enviado para el jugador: {darkred}{1}"
+	}
+
+	"Report Is On Cooldown"
+	{
+		"#format"	"{1:d}"
+		"es"		"Reportaste un jugador recientemente. Espera {green}{1}{yellow} segundos y vuelve a intentarlo."
+	}
+
+	"Admin MSG Title"
+	{
+		"es"		"{yellow}--- {lightred}NOTIFICACION DE REPORTE {yellow}---"
+	}
+
+	"Admin MSG Who Reported"
+	{
+		"#format"	"{1:s}"
+		"es"		"Reporte del jugador: {green}{1}"
+	}
+
+	"Admin MSG Reported Player"
+	{
+		"#format"	"{1:s}"
+		"es"		"Jugador reportado: {darkred}{1}"
+	}
+	"Admin MSG Report Reason"
+	{
+		"#format"	"{1:s}"
+		"es"		"Razon: {purple}{1}"
+	}
+}
