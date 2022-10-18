@@ -1,0 +1,77 @@
+﻿"Phrases"
+{
+	"Reports Menu Title"
+	{
+		"chi"	"选择你要举报的玩家"
+	}
+	
+	"Invalid Target Index"
+	{
+		"chi"	"无效的目标对象"
+	}
+
+	"Reports Reasons Title"
+	{
+		"#format" "{1:s},{2:s}"
+		"chi"	"选择举报理由{1}玩家 [ {2} ]将被举报"
+	}
+	"Custom Reason"
+	{
+		"chi"	"自定义理由"
+	}
+	
+	"Input Custom Reason"
+	{
+		"chi"	"请在聊天框中输入你的举报理由。输入 \"cancel\" 或者 \"stop\" 可取消"
+	}
+	"Entered Reason Too Long"
+	{
+		"chi"	"你输入的举报理由太长了"
+	}
+	"Entered Reason Is Empty"
+	{
+		"chi"	"举报理由不能为空白"
+	}
+    "Contains blocked chars"
+    {
+        "chi"    "你的举报理由包含敏感词"
+    }
+	"Cancel Custom Report"
+	{
+        "chi"    "举报已被取消"
+    }
+	
+	"Report Successfuly Sent"
+	{
+		"#format" "{1:s}"
+		"chi"	"你的举报已被发送给玩家: {darkred}{1}"
+	}
+	
+	"Report Is On Cooldown"
+	{
+		"#format"	"{1:d}"
+		"chi"		"你最近已经举报过其他玩家. 请等待 {green}{1}{yellow} 秒后重试"
+	}
+	
+	"Admin MSG Title"
+	{
+		"chi"		"{yellow}--- {lightred}举报通知信息 {yellow}---"
+	}
+	
+	"Admin MSG Who Reported"
+	{
+		"#format"	"{1:s}"
+		"chi"		"来自玩家: {green}{1} 的举报"
+	}
+	
+	"Admin MSG Reported Player"
+	{
+		"#format"	"{1:s}"
+		"chi"		"被举报的玩家是: {darkred}{1}"
+	}
+	"Admin MSG Report Reason"
+	{
+		"#format"	"{1:s}"
+		"chi"		"举报理由: {purple}{1}"
+	}
+}
