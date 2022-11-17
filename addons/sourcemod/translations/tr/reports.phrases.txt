@@ -1,0 +1,69 @@
+"Phrases"
+{
+	"Reports Menu Title"
+	{
+		"tr"	"Raporlamak istediğiniz oyuncuyu seçin;"
+	}
+	"Invalid Target Index"
+	{
+		"tr"	"Geçersiz Hedef"
+	}
+	"Reports Reasons Title"
+	{
+		"#format" "{1:s},{2:s}"
+		"tr"	"Rapor sebebi seçin {1}Rapor edilecek oyuncu [ {2} ]"
+	}
+	"Custom Reason"
+	{
+		"tr"	"Kendi Sebebim"
+	}
+	"Input Custom Reason"
+	{
+		"tr"	"Sohbete rapor sebebini yazın. iptal için \"cancel\" veya \"stop\" yazabilirsiniz"
+	}
+	"Entered Reason Too Long"
+	{
+		"tr"	"Girilen nedeniniz çok uzun"
+	}
+	"Entered Reason Is Empty"
+	{
+		"tr"	"Rapor sebebin boş olamaz"
+	}
+	"Contains blocked chars"
+	{
+		"tr"    "Rapor sebebiniz engellenen karakterler içeriyor."
+	}
+	"Cancel Custom Report"
+	{
+		"tr"    "Raporunuz iptal edildi."
+	}
+	"Report Successfuly Sent"
+	{
+		"#format" "{1:s}"
+		"tr"	"{green}{1}{yellow} oyuncuyla ilgili raporunuz iletildi yetkili arkadaşlarımız en kısa zamanda ilginecektir!"
+	}
+	"Report Is On Cooldown"
+	{
+		"#format"	"{1:d}"
+		"tr"		"Rapor sistemini kullanabilmek için {green}{1}{yellow} saniye beklemeniz gerekiyor."
+	}
+	"Admin MSG Title"
+	{
+		"tr"		"{yellow}--- {lightred}RAPOR BİLDİRİMİ {yellow}---"
+	}
+	"Admin MSG Who Reported"
+	{
+		"#format"	"{1:s}"
+		"tr"		"Rapor eden: {green}{1}"
+	}
+	"Admin MSG Reported Player"
+	{
+		"#format"	"{1:s}"
+		"tr"		"Rapor edilen: {orange}{1}"
+	}
+	"Admin MSG Report Reason"
+	{
+		"#format"	"{1:s}"
+		"tr"		"Sebep: {yellow}{1}"
+	}
+}
