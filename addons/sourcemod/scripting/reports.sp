@@ -26,7 +26,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.0.2"
+#define PLUGIN_VERSION "2.0.5"
 
 #define REPORT_REASONS_SIZE 128
 #define DISCORD_ROLE_ID_SIZE 128
@@ -42,6 +42,7 @@ enum struct ReportsData
 	bool useSourcebansReport;
 	bool admin_notify;
 	bool admin_sound;
+	bool list_admin;
 	
 	char admin_sound_path[PLATFORM_MAX_PATH];
 	char server_name[32];
@@ -55,6 +56,7 @@ enum struct ReportsData
 enum struct DiscordData
 {
 	bool integration_enabled;
+	bool embed_force_ping;
 	int message_type;
 	
 	char message[MAX_DISCORD_MSG_SIZE];
@@ -92,9 +94,12 @@ ConVar g_Cvar_DatabaseName;
 
 char GAMETYPE[32];
 int g_ReportTarget[MAXPLAYERS + 1];
+int g_BannedTarget[MAXPLAYERS + 1];
 int g_ReportCooldown[MAXPLAYERS + 1];
 bool g_ReportCustomReason = false;
 bool g_WaitingForCustomReason[MAXPLAYERS + 1];
+
+bool g_PlayerBanned[MAXPLAYERS+1] = false;
 
 public Plugin myinfo = 
 {
@@ -111,6 +116,8 @@ public void OnPluginStart()
 	
 	RegConsoleCmd("sm_report", Command_ReportMenu, "Display main report menu");
 	RegConsoleCmd("sm_zglos", Command_ReportMenu, "Display main report menu");
+
+	RegConsoleCmd("sm_reportpanel", Command_ReportAdminMenu);
 	
 	RegAdminCmd("sm_reloadreports", Command_ReloadConfig, ADMFLAG_ROOT, "Reloads config file");
 	
@@ -150,6 +157,14 @@ public void OnClientPutInServer(int client)
 {
 	g_WaitingForCustomReason[client] = false;
 	g_ReportCooldown[client] = 0;
+
+	g_PlayerBanned[client] = false;
+
+	//TODO check if player is actually banned or not (timestamp)
+	if()
+	{
+		
+	}
 }
 
 bool Database_Init(const char[] databaseName)
@@ -178,6 +193,15 @@ bool Database_Init(const char[] databaseName)
 		..."`game` VARCHAR(32) NOT NULL,"
 		..."`time` INT(20) NOT NULL,"
 		..."PRIMARY KEY (id)) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+
+	// TODO FINISH QUERY
+	SQL_Query(g_DB, "CREATE TABLE IF NOT EXISTS `banned_players` ("
+		..."`id` INT(20) NOT NULL AUTO_INCREMENT,"
+		..."`player_steamid` BIGINT NOT NULL,"
+		..."`player_name` VARCHAR(127) NOT NULL,"
+		..."`time` INT(20) NOT NULL,"
+		..."PRIMARY KEY (id)) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");		
 	
 	return true;
 }
@@ -195,6 +219,130 @@ public Action Command_ReloadConfig(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Command_ReportAdminMenu(int client, int args)
+{
+	if (!IsClientAdmin(client))
+	{
+		CPrintToChat(client, "%s %t", g_ReportsData.chat_prefix, "No Access To Command");
+		return Plugin_Handled;
+	}
+
+	Menu menu = new Menu(Report_AdminHandler, MENU_ACTIONS_ALL);
+
+	menu.Pagination = true;
+
+	char display[MAX_NAME_LENGTH];
+	char userId[16];
+
+	int players = 0;
+
+	for (int i = 1; i < MaxClients; ++i)
+	{
+		if (!IsClientAuthorized(i) || !IsClientInGame(i) || IsFakeClient(i) || i == client)
+			continue;
+		
+		GetClientName(i, display, sizeof(display));
+		IntToString(GetClientUserId(i), userId, sizeof(userId));
+		
+		menu.AddItem(userId, display);
+		
+		players++;
+	}
+	
+	if (players == 0)
+		menu.AddItem("", "No players on the server to block", ITEMDRAW_DISABLED);
+	
+	menu.Display(client, MENU_TIME_FOREVER);
+	
+	return Plugin_Handled;	
+}
+
+public int Report_AdminHandler(Menu menu, MenuAction action, int param1, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_End:
+		{
+			delete menu;
+		}
+		case MenuAction_Display:
+		{
+			char title[255];
+			FormatEx(title, sizeof(title), "%T", "Reports Admin Menu Title", param1);
+			Panel panel = view_as<Panel>(param2);
+			panel.SetTitle(title);
+		}
+		case MenuAction_Select:
+		{
+			char info[16];
+			menu.GetItem(param2, info, sizeof(info));
+			
+			int target = GetClientOfUserId(StringToInt(info));
+			CreateBlockMenu(param1, target);
+		}
+	}
+	
+	return 0;
+}
+
+public void CreateBlockMenu(int client, int target)
+{
+	Menu menu = new Menu(Menu_HandlerBlockType, MENU_ACTIONS_ALL);
+	menu.Pagination = true;
+	
+	int players = 0;
+
+	char name[MAX_NAME_LENGTH];
+	char userid[16];
+
+	for(int i = 1; i <= MaxClients; ++i)
+	{
+		if (!IsClientAuthorized(i) || IsFakeClient(i) || !IsClientInGame(i) || IsClientAdmin(i) || i == client)
+			continue; // skip invalid clients/admins that will throw an error.
+
+		GetClientName(i, name, sizeof(name));
+		IntToString(GetClientOfUserId(i), userid, sizeof(userid)); // needs to be valid userid
+
+		menu.AddItem(userid, name); // unique client id + his name to select
+
+		++players;
+	}
+
+	if (players == 0)
+		menu.AddItem("null", "No players on the server to select");
+
+	menu.Display(client, MENU_TIME_FOREVER);		
+}
+
+public int Menu_HandlerBlockType(Menu menu, MenuAction action, int param1, int param2)
+{
+	switch (action)
+	{
+		case MenuAction_End:
+		{
+			delete menu;
+		}
+		case MenuAction_Cancel:
+		{
+			// go back to previous selection
+		}
+		case MenuAction_Select:
+		{
+			// Perform blocking
+		}
+		case MenuAction_DrawItem:
+		{
+			// display to client
+		}
+		case MenuAction_Display:
+		{
+			// Title
+		}
+	}
+
+	delete menu;
+}
+
 public Action Command_ReportMenu(int client, int args)
 {
 	Menu menu = new Menu(Report_Handler, MENU_ACTIONS_ALL);
@@ -209,6 +357,9 @@ public Action Command_ReportMenu(int client, int args)
 	for (int i = 1; i < MaxClients; ++i)
 	{
 		if (!IsClientAuthorized(i) || !IsClientInGame(i) || IsFakeClient(i) || i == client)
+			continue;
+
+		if (IsClientAdmin(i) && !g_ReportsData.list_admin)
 			continue;
 		
 		GetClientName(i, display, sizeof(display));
@@ -486,6 +637,12 @@ void DiscordSendData(DiscordReportData report)
 	if (g_DiscordData.message_type == 1) // embed
 	{
 		FormatDiscordMessage(true, report, mentions, message, sizeof(message));
+
+		if (g_DiscordData.embed_force_ping)
+		{
+			hook.SetContent(mentions);
+			hook.Send();
+		}		
 		
 		MessageEmbed Embed = new MessageEmbed();
 		hook.SlackMode = true;
@@ -640,6 +797,7 @@ void Config_GetMainData(KeyValues kv)
 
 	g_ReportsData.admin_notify = view_as<bool>(kv.GetNum("admin_notification"));
 	g_ReportsData.admin_sound = view_as<bool>(kv.GetNum("admin_notification_sound"));
+	g_ReportsData.list_admin = view_as<bool>(kv.GetNum("admin_listed"));
 	
 	kv.GetString("admin_sound_path", g_ReportsData.admin_sound_path, sizeof(ReportsData::admin_sound_path));
 	kv.GetString("server_name", g_ReportsData.server_name, sizeof(ReportsData::server_name));
@@ -767,6 +925,8 @@ void Config_GetDiscordEmbedData(KeyValues kv)
 	kv.GetString("embed_color", g_DiscordData.embed_color, sizeof(DiscordData::embed_color));
 	kv.GetString("embed_footer", g_DiscordData.embed_footer, sizeof(DiscordData::embed_footer));
 	kv.GetString("embed_thumbnail_url", g_DiscordData.embed_thmb_url, sizeof(DiscordData::embed_thmb_url));
+	
+	g_DiscordData.embed_force_ping = view_as<bool>(kv.GetNum("embed_force_ping"));
 	
 	kv.Rewind();
 }
@@ -915,3 +1075,4 @@ bool IsClientAdmin(int client)
 {
 	return CheckCommandAccess(client, "reports_admin", ADMFLAG_BAN);
 }
+
