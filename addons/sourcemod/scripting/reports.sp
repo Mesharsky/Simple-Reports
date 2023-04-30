@@ -26,7 +26,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.0.2"
+#define PLUGIN_VERSION "2.0.5"
 
 #define REPORT_REASONS_SIZE 128
 #define DISCORD_ROLE_ID_SIZE 128
@@ -42,6 +42,7 @@ enum struct ReportsData
 	bool useSourcebansReport;
 	bool admin_notify;
 	bool admin_sound;
+	bool list_admin;
 	
 	char admin_sound_path[PLATFORM_MAX_PATH];
 	char server_name[32];
@@ -55,6 +56,7 @@ enum struct ReportsData
 enum struct DiscordData
 {
 	bool integration_enabled;
+	bool embed_force_ping;
 	int message_type;
 	
 	char message[MAX_DISCORD_MSG_SIZE];
@@ -177,7 +179,7 @@ bool Database_Init(const char[] databaseName)
 		..."`report_reason` VARCHAR(64) NOT NULL,"
 		..."`game` VARCHAR(32) NOT NULL,"
 		..."`time` INT(20) NOT NULL,"
-		..."PRIMARY KEY (id)) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+		..."PRIMARY KEY (id)) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");		
 	
 	return true;
 }
@@ -209,6 +211,9 @@ public Action Command_ReportMenu(int client, int args)
 	for (int i = 1; i < MaxClients; ++i)
 	{
 		if (!IsClientAuthorized(i) || !IsClientInGame(i) || IsFakeClient(i) || i == client)
+			continue;
+
+		if (IsClientAdmin(i) && !g_ReportsData.list_admin)
 			continue;
 		
 		GetClientName(i, display, sizeof(display));
@@ -486,26 +491,27 @@ void DiscordSendData(DiscordReportData report)
 	if (g_DiscordData.message_type == 1) // embed
 	{
 		FormatDiscordMessage(true, report, mentions, message, sizeof(message));
+
+		if (g_DiscordData.embed_force_ping)
+		{
+			hook.SetContent(mentions);
+		}		
 		
-		MessageEmbed Embed = new MessageEmbed();
-		hook.SlackMode = true;
+		DiscordEmbed embed = new DiscordEmbed();
 		
-		Embed.SetColor(g_DiscordData.embed_color);
-		Embed.SetThumb(g_DiscordData.embed_thmb_url);
-		Embed.SetTitle(g_DiscordData.embed_title);
-		Embed.AddField(g_DiscordData.embed_field_name, message, true);
-		Embed.SetFooter(g_DiscordData.embed_footer);
+		embed.SetColor(g_DiscordData.embed_color);
+		embed.WithThumbnail(new DiscordEmbedThumbnail(g_DiscordData.embed_thmb_url, 200, 300));
+		embed.WithTitle(g_DiscordData.embed_title);
+		embed.AddField(new DiscordEmbedField(g_DiscordData.embed_field_name, message));
+		embed.WithFooter(new DiscordEmbedFooter(g_DiscordData.embed_footer));
 		
-		hook.Embed(Embed);
+		hook.Embed(embed);
 		hook.Send();
-		
 		delete hook;
 	}
 	else // normal message
 	{
 		FormatDiscordMessage(false, report, mentions, message, sizeof(message));
-		
-		hook.SlackMode = false;
 		
 		hook.SetContent(message);
 		hook.Send();
@@ -640,6 +646,7 @@ void Config_GetMainData(KeyValues kv)
 
 	g_ReportsData.admin_notify = view_as<bool>(kv.GetNum("admin_notification"));
 	g_ReportsData.admin_sound = view_as<bool>(kv.GetNum("admin_notification_sound"));
+	g_ReportsData.list_admin = view_as<bool>(kv.GetNum("admin_listed"));
 	
 	kv.GetString("admin_sound_path", g_ReportsData.admin_sound_path, sizeof(ReportsData::admin_sound_path));
 	kv.GetString("server_name", g_ReportsData.server_name, sizeof(ReportsData::server_name));
@@ -767,6 +774,8 @@ void Config_GetDiscordEmbedData(KeyValues kv)
 	kv.GetString("embed_color", g_DiscordData.embed_color, sizeof(DiscordData::embed_color));
 	kv.GetString("embed_footer", g_DiscordData.embed_footer, sizeof(DiscordData::embed_footer));
 	kv.GetString("embed_thumbnail_url", g_DiscordData.embed_thmb_url, sizeof(DiscordData::embed_thmb_url));
+	
+	g_DiscordData.embed_force_ping = view_as<bool>(kv.GetNum("embed_force_ping"));
 	
 	kv.Rewind();
 }

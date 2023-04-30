@@ -4,6 +4,11 @@
 	{
 		"en"	"Choose the player you want to report"
 	}
+
+	"Reports Admin Menu Title"
+	{
+		"en"	"Choose the player which you want block from reporting"
+	}
 	
 	"Invalid Target Index"
 	{
@@ -73,5 +78,10 @@
 	{
 		"#format"	"{1:s}"
 		"en"		"Reason: {purple}{1}"
+	}
+
+	"No Access To Command"
+	{
+		"en"	"You don't have permissions to access that command"
 	}
 }

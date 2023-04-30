@@ -4,6 +4,11 @@
 	{
 		"pl"	"Wybierz gracza którego chcesz zgłosić"
 	}
+
+	"Reports Admin Menu Title"
+	{
+		"pl"	"Wybierz gracza któremu chcesz zabrać dostęp do zgłoszeń"
+	}
 	
 	"Invalid Target Index"
 	{
@@ -73,4 +78,8 @@
 		"pl"		"Powód: {purple}{1}"
 	}
 	
+	"No Access To Command"
+	{
+		"pl"	"Nie masz uprawnień by skorzystać z tej komendy"
+	}
 }
